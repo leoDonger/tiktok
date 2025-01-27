@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { S3 } from "aws-sdk";
-import { PrismaClient } from "@prisma/client";
+import { uploadToS3 } from "@/lib/video";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -16,28 +15,14 @@ export async function POST(request: NextRequest) {
   const file = formData.get("file") as File;
   const caption = formData.get("caption")?.toString() || "";
 
-  // Upload to S3 (example)
-  const s3 = new S3({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-    region: process.env.AWS_REGION,
-  });
-
-  const uploadParams = {
-    Bucket: process.env.S3_BUCKET_NAME!,
-    Key: `videos/${Date.now()}-${file.name}`,
-    Body: Buffer.from(await file.arrayBuffer()),
-    ContentType: file.type,
-  };
-
   try {
-    const uploadResult = await s3.upload(uploadParams).promise();
+    const uploadResult = await uploadToS3(file.name, Buffer.from(await file.arrayBuffer()))
 
-    // Store in DB
     const video = await prisma.video.create({
       data: {
         caption,
-        url: uploadResult.Location,
+        url: uploadResult,
+        s3Key: uploadResult,
         userId: session.user.id,
       },
     });

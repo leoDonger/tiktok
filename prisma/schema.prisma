@@ -31,7 +31,8 @@ model User {
 
 model Video {
   id          String   @id @default(uuid())
-  caption     String
+  s3Key       String   @unique
+  caption     String   @default("Video ${id}")
   url         String
   thumbnail   String?
   userId      String

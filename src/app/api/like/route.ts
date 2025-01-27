@@ -1,39 +1,43 @@
 // POST body: { videoId: string }
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
-const prisma = new PrismaClient();
-
 export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
 
-  const { videoId } = await request.json();
+
   try {
-    // Check if already liked
+    // const session = await getServerSession(authOptions);
+    // if (!session?.user) {
+    //     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // }
+
+    const body  = await request.json();
+
+    if (!body) {
+        return NextResponse.json({ error: "Missing videoId or userId" }, { status: 400 });
+    }
+
     const existingLike = await prisma.like.findFirst({
       where: {
-        videoId,
-        userId: session.user.id,
+        videoId: body.videoId,
+        // userId: session.user.id,
+        userId: "demo-user-123",
       },
     });
 
     if (existingLike) {
-      // Unlike (delete)
       await prisma.like.delete({
         where: { id: existingLike.id },
       });
       return NextResponse.json({ liked: false });
     } else {
-      // Like (create)
       await prisma.like.create({
         data: {
-          userId: session.user.id,
-          videoId,
+        //   userId: session.user.id,
+          userId: "demo-user-123",
+          videoId: body.videoId,
         },
       });
       return NextResponse.json({ liked: true });

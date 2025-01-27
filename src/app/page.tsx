@@ -1,134 +1,254 @@
 // import Image from "next/image";
+// import { prisma } from "@/lib/prisma";
+// import { getS3PresignedUrl } from "@/lib/video";
+// import MoreVideoButton from "./components/MoreVideoButton";
+// import LikeButton from "./components/LikeButton";
+// import VideoCard from "./components/VideoCard";
 
-// export default function Home() {
+// const DEMO_USER_ID = "demo-user-123";
+
+// async function fetchVideos() {
+//   const videos = await prisma.video.findMany({
+//     orderBy: { createdAt: "desc" },
+//     include: {
+//       likes: true,
+//     },
+//   });
+
+//   const withPresignedUrls = await Promise.all(
+//     videos.map(async (video) => {
+//       const presignedUrl = await getS3PresignedUrl(video.s3Key, 3600); // 1-hour link
+//       return {
+//         ...video,
+//         presignedUrl,
+//       };
+//     })
+//   );
+
+//   return withPresignedUrls;
+// }
+
+// export default async function Home() {
+//   const videos = await fetchVideos();
+
 //   return (
-//     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-//       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-//         <Image
-//           className="dark:invert"
-//           src="/next.svg"
-//           alt="Next.js logo"
-//           width={180}
-//           height={38}
-//           priority
-//         />
-//         <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-//           <li className="mb-2">
-//             Get started by editing{" "}
-//             <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-//               src/app/page.tsx
-//             </code>
-//             .
-//           </li>
-//           <li>Save and see your changes instantly.</li>
-//         </ol>
+//     <main style={{ padding: "16px", maxWidth: "600px", margin: "0 auto" }}>
+//       <h1>My TikTok Clone</h1>
 
-//         <div className="flex gap-4 items-center flex-col sm:flex-row">
-//           <a
-//             className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-//             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             <Image
-//               className="dark:invert"
-//               src="/vercel.svg"
-//               alt="Vercel logomark"
-//               width={20}
-//               height={20}
-//             />
-//             Deploy now
-//           </a>
-//           <a
-//             className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-//             href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//             target="_blank"
-//             rel="noopener noreferrer"
-//           >
-//             Read our docs
-//           </a>
-//         </div>
-//       </main>
-//       <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-//         <a
-//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-//           href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           <Image
-//             aria-hidden
-//             src="/file.svg"
-//             alt="File icon"
-//             width={16}
-//             height={16}
-//           />
-//           Learn
-//         </a>
-//         <a
-//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-//           href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           <Image
-//             aria-hidden
-//             src="/window.svg"
-//             alt="Window icon"
-//             width={16}
-//             height={16}
-//           />
-//           Examples
-//         </a>
-//         <a
-//           className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-//           href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           <Image
-//             aria-hidden
-//             src="/globe.svg"
-//             alt="Globe icon"
-//             width={16}
-//             height={16}
-//           />
-//           Go to nextjs.org →
-//         </a>
-//       </footer>
-//     </div>
+//       <MoreVideoButton />
+
+//       <div style={{ marginTop: "2rem" }}>
+//         {videos.map((video) => {
+//           const userAlreadyLiked = video.likes.some(
+//             (like) => like.userId === DEMO_USER_ID
+//           );
+
+//           return (
+//             <div
+//               key={video.id}
+//               style={{
+//                 border: "1px solid #ccc",
+//                 borderRadius: "8px",
+//                 padding: "1rem",
+//                 marginBottom: "1.5rem",
+//               }}
+//             >
+//               <h3 style={{ margin: "0 0 8px" }}>{video.caption}</h3>
+
+//               <VideoCard src={video.presignedUrl} />
+
+//               <div style={{ marginTop: "8px" }}>
+//                 <LikeButton
+//                   videoId={video.id}
+//                   initialLiked={userAlreadyLiked}
+//                 />
+//                 <span style={{ marginLeft: "8px" }}>
+//                   Likes: {video.likes.length}
+//                 </span>
+//               </div>
+//             </div>
+//           );
+//         })}
+//       </div>
+//     </main>
 //   );
 // }
 
 
-import { PrismaClient } from "@prisma/client";
+import Image from "next/image";
+import { prisma } from "@/lib/prisma";
+import { getS3PresignedUrl } from "@/lib/video";
+import VideoCard from "./components/VideoCard";
+import LikeButton from "./components/LikeButton";
+import MoreVideoButton from "./components/MoreVideoButton";
 
-const prisma = new PrismaClient();
+const DEMO_USER_ID = "demo-user-123";
 
-export default async function Home() {
-  // Fetch videos
+const clipsContainerStyle: React.CSSProperties = {
+  flex: 1,
+  backgroundColor: "#f9f9f9",
+  position: "relative",
+  overflowY: "scroll",
+  WebkitOverflowScrolling: "touch" as any,
+  scrollbarWidth: "none",      
+  msOverflowStyle: "none",    
+};
+
+async function getVideos() {
   const videos = await prisma.video.findMany({
-    include: { user: true, likes: true },
     orderBy: { createdAt: "desc" },
-    take: 10, // or implement infinite scroll
+    include: { likes: true }, 
   });
 
+  const videosWithSignedUrls = await Promise.all(
+    videos.map(async (v) => {
+      const presignedUrl = await getS3PresignedUrl(v.s3Key, 3600); // 1 hour
+      return {
+        id: v.id,
+        caption: v.caption,
+        s3Key: v.s3Key,
+        presignedUrl,
+        likesCount: v.likes.length,
+      };
+    })
+  );
+
+  return videosWithSignedUrls;
+}
+
+export default async function HomePage() {
+  const videos = await getVideos();
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        {videos.map((video) => (
-          <div key={video.id} style={{ marginBottom: "2rem" }}>
-            <video
-              src={video.url}
-              controls
-              style={{ width: "100%", maxHeight: "400px", objectFit: "cover" }}
-            />
-            <p>{video.caption}</p>
-            <p>Uploaded by: {video.user?.name || "Unknown"}</p>
-            <p>Likes: {video.likes.length}</p>
+    <main style={{ margin: 0, padding: 0 }}>
+      <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+
+        <header
+          style={{
+            height: "60px",
+            display: "flex",
+            alignItems: "center",
+            padding: "0 16px",
+            borderBottom: "1px solid #ccc",
+          }}
+        >
+
+        <Image
+          className="dark:invert"
+          src="/next.svg"
+          alt="User Profile"
+          width={40}
+          height={40}
+          style={{ marginRight: "16px" }}
+        />
+        <h1 style={{ fontSize: "1.2rem", margin: 0 }}>TikTok Clone</h1>
+
+          <div style={{ marginLeft: "auto" }}>
+            <MoreVideoButton />
           </div>
-        ))}
-      </main>
-    </div>
+        </header>
+
+        {/* -- Scrollable feed area -- */}
+        <div
+          id="clips-container"
+          style={clipsContainerStyle}>
+          {videos.map((vid) => (
+            <div
+              key={vid.id}
+              style={{
+                position: "relative",
+                height: "100vh",
+                borderBottom: "1px solid #ddd",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <div style={{ width: "306px", height: "704px" }}>
+                <VideoCard
+                  src={vid.presignedUrl}
+                />
+              </div>
+
+              <div
+                style={{
+                  position: "absolute",
+                  right: "16px",
+                  bottom: "20%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "16px",
+                }}
+              >
+                <div
+                  style={{
+                    background: "white",
+                    borderRadius: "50%",
+                    width: 48,
+                    height: 48,
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <LikeButton videoId={vid.id} initialLiked={false} />
+                </div>
+                <span style={{ fontSize: "0.8rem" }}>{vid.likesCount}</span>
+
+                <div
+                  style={{
+                    background: "white",
+                    borderRadius: "50%",
+                    width: 48,
+                    height: 48,
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  💬
+                </div>
+                <span style={{ fontSize: "0.8rem" }}>0</span>
+
+                <div
+                  style={{
+                    background: "white",
+                    borderRadius: "50%",
+                    width: 48,
+                    height: 48,
+                    border: "none",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  ↗
+                </div>
+              </div>
+
+              <div
+                style={{
+                  position: "absolute",
+                  left: "16px",
+                  bottom: "16px",
+                  color: "#000",
+                  background: "rgba(255, 255, 255, 0.8)",
+                  padding: "4px 8px",
+                  borderRadius: "4px",
+                }}
+              >
+                {vid.caption}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
   );
 }

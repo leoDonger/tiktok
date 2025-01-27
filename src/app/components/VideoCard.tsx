@@ -1,6 +1,4 @@
-// app/components/VideoCard.tsx
 "use client";
-
 import React, { useRef, useEffect } from "react";
 
 export default function VideoCard({ src }: { src: string }) {
